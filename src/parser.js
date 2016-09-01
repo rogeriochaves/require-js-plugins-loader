@@ -1,7 +1,3 @@
-// const matches = file.match(/define\(\[([\s\S]*?)\].*?function.*?\(([\s\S]*?)\)/);
-//
-// const fileWithoutPlugins = file.replace(matches[1], removePluginsFromRequestedDependencies(matches[1]));
-
 const requestedDependencies = (file) =>
   file.match(/define\(\[([\s\S]*?)\].*?function/)[1].trim();
 
