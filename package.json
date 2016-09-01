@@ -1,7 +1,12 @@
 {
   "name": "require-js-plugins-loader",
   "version": "0.0.1",
-  "description": "",
+  "description": "A webpack loader to lazy load RequireJS plugins",
+  "keywords": [
+    "webpack",
+    "requirejs",
+    "loader"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "mocha"
