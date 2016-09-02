@@ -34,6 +34,18 @@ const removePluginsFromInjectedDependencies = (injectedDependencies, plugins) =>
     .join('')
     .replace(lastComma, '$1');
 
+const lazyLoadPlugins = (file, plugins) =>
+  plugins.reduce((file, {name, args}) =>
+    `var ${name}Plugin = require('${name}').load;
+
+    ${name}Plugin('${args}', require, function (${name}) {
+      ${file}
+    }, {});`
+  , file);
+
+const hasPlugins = (file) =>
+  !!requestedDependencies(file).match(pluginRegex);
+
 const parse = (file) => {
   let reqDependencies = requestedDependencies(file);
   let injDependencies = injectedDependencies(file);
@@ -46,15 +58,6 @@ const parse = (file) => {
   return lazyLoadPlugins(fileWithoutPlugins, plugins);
 };
 
-const lazyLoadPlugins = (file, plugins) =>
-  plugins.reduce((file, {name, args}) =>
-    `var ${name}Plugin = require('${name}').load;
-
-    ${name}Plugin('${args}', require, function (${name}) {
-      ${file}
-    }, {});`
-  , file);
-
 module.exports = {
   parse,
   requestedDependencies,
@@ -62,5 +65,6 @@ module.exports = {
   removePluginsFromRequestedDependencies,
   injectedDependencies,
   removePluginsFromInjectedDependencies,
-  lazyLoadPlugins
+  lazyLoadPlugins,
+  hasPlugins
 }

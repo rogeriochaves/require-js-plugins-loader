@@ -110,4 +110,18 @@ describe('parser', () => {
       }, {});
     `));
   });
+
+  describe('has any plugins', () => {
+    it('returns true for files that have plugins', () => {
+      expect(parser.hasPlugins(fileFixture)).to.equal(true);
+    });
+
+    it('returns true for files that does not have plugins', () => {
+      expect(parser.hasPlugins(`
+        define([foo], function(foo) {
+          var foo = 'bar!baz';
+        });
+      `)).to.equal(false);
+    });
+  });
 });
