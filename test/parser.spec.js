@@ -3,6 +3,7 @@ let parser = require('../src/parser');
 let jsBeautify = require('js-beautify').js_beautify;
 let beautify = (data) =>
   jsBeautify(data, {max_preserve_newlines: 1})
+let moduleSyntaxFixtures = require('./moduleSyntaxFixtures');
 
 describe('parser', () => {
   const requestedDependencies = `
@@ -52,6 +53,32 @@ describe('parser', () => {
         }, {});
       }, {});
     `));
+  });
+
+  describe('different AMD patterns', () => {
+    it('parses anonymous modules', () => {
+      expect(parser.parse(moduleSyntaxFixtures.anonymousModule)).to.match(/examplePlugin\('args'/);
+    });
+
+    it('parses named modules', () => {
+      expect(parser.parse(moduleSyntaxFixtures.namedModule)).to.match(/examplePlugin\('args'/);
+    });
+
+    it('parses anonymous modules with arrow functions', () => {
+      expect(parser.parse(moduleSyntaxFixtures.anonymousArrow)).to.match(/examplePlugin\('args'/);
+    });
+
+    it('parses named modules with arrow functions', () => {
+      expect(parser.parse(moduleSyntaxFixtures.namedArrow)).to.match(/examplePlugin\('args'/);
+    });
+
+    it('ignores non-amd modules', () => {
+      expect(parser.parse(moduleSyntaxFixtures.nonAMD)).to.equal(moduleSyntaxFixtures.nonAMD);
+    });
+
+    it('ignores modules without plugins', () => {
+      expect(parser.parse(moduleSyntaxFixtures.withoutPlugin)).to.equal(moduleSyntaxFixtures.withoutPlugin);
+    });
   });
 
   it('finds the requested dependencies', () => {
@@ -111,12 +138,12 @@ describe('parser', () => {
     `));
   });
 
-  describe('has any plugins', () => {
+  describe('searches for plugins', () => {
     it('returns true for files that have plugins', () => {
       expect(parser.hasPlugins(fileFixture)).to.equal(true);
     });
 
-    it('returns true for files that does not have plugins', () => {
+    it('returns false for files that do not have plugins', () => {
       expect(parser.hasPlugins(`
         define([foo], function(foo) {
           var foo = 'bar!baz';

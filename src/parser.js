@@ -1,7 +1,11 @@
-const requestedDependencies = (file) =>
-  file.match(/define\(\[([\s\S]*?)\].*?function/)[1].trim();
-
+const defineRegex = `define\\(.*?\\[([\\s\\S]*?)\\].*?`;
+const anyFunctionRegex = `\\(([\\s\\S]*?)\\)`;
+const amdRegex = new RegExp(`${defineRegex}${anyFunctionRegex}`);
+const lastCommaRegex = /,([\n\t\s]*)$/g;
 const pluginRegex = /[\d\w-_]+![\d\w-_\*]+/g;
+
+const requestedDependencies = (file) =>
+  file.match(amdRegex)[1].trim();
 
 const parsePlugin = (plugin, index) => {
   if (!plugin.match(pluginRegex)) return null;
@@ -13,16 +17,14 @@ const parsePlugin = (plugin, index) => {
 const findPlugins = (requestedDependencies) =>
   requestedDependencies.match(/['"`](.*?)['"`]/g).map(parsePlugin).filter(p => p);
 
-const lastComma = /,([\n\t\s]*)$/g;
-
 const removePluginsFromRequestedDependencies = (requestedDependencies) =>
   requestedDependencies
     .replace(pluginRegex, '')
     .replace(/[\s\t]+(''|""|``),?/g, '')
-    .replace(lastComma, '$1');
+    .replace(lastCommaRegex, '$1');
 
 const injectedDependencies = (file) =>
-  file.match(/define[\s\S]*?function.*?\(([\s\S]*?)\)/)[1];
+  file.match(amdRegex)[2];
 
 const isNotPlugin = (plugins) => (_, index) =>
   !plugins.some(plugin => plugin.index === index);
@@ -32,7 +34,7 @@ const removePluginsFromInjectedDependencies = (injectedDependencies, plugins) =>
     .match(/[\t\s\d\w_\$]+,?/g)
     .filter(isNotPlugin(plugins))
     .join('')
-    .replace(lastComma, '$1');
+    .replace(lastCommaRegex, '$1');
 
 const lazyLoadPlugins = (file, plugins) =>
   plugins.reduce((file, {name, args}) =>
@@ -47,6 +49,8 @@ const hasPlugins = (file) =>
   !!requestedDependencies(file).match(pluginRegex);
 
 const parse = (file) => {
+  if (!file.match(amdRegex) || !hasPlugins(file)) return file;
+
   let reqDependencies = requestedDependencies(file);
   let injDependencies = injectedDependencies(file);
   let plugins = findPlugins(reqDependencies);
