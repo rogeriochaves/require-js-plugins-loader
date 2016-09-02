@@ -1,6 +1,6 @@
 {
   "name": "require-js-plugins-loader",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A webpack loader to lazy load RequireJS plugins",
   "keywords": [
     "webpack",
