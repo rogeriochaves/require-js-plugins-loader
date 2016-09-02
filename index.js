@@ -1,3 +1,6 @@
 let {parse} = require('./src/parser');
 
-module.exports = parse;
+module.exports = function (source) {
+  this.cacheable();
+  return parse(source);
+}
