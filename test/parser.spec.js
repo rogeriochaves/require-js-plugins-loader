@@ -1,7 +1,8 @@
 let expect = require('chai').expect;
 let parser = require('../src/parser');
+let jsBeautify = require('js-beautify').js_beautify;
 let beautify = (data) =>
-  require('js-beautify').js_beautify(data, {max_preserve_newlines: 1})
+  jsBeautify(data, {max_preserve_newlines: 1})
 
 describe('parser', () => {
   const requestedDependencies = `
@@ -9,7 +10,7 @@ describe('parser', () => {
     "backbone",
     'backbone-validation',
     \`i18n!*\`,
-    'foo!*'
+    'foo!bar'
   `;
   const injectedDependencies = `
     _,
@@ -28,14 +29,14 @@ describe('parser', () => {
     };
   `);
 
-  it('should work', () => {
+  it('parses the file, loading the requirejs plugins', () => {
     expect(beautify(parser.parse(fileFixture))).to.equal(beautify(`
-      var fooLazy = require('bundle!foo');
+      var fooPlugin = require('foo').load;
 
-      fooLazy(function (foo) {
-        var i18nLazy = require('bundle!i18n');
+      fooPlugin('bar', require, function (foo) {
+        var i18nPlugin = require('i18n').load;
 
-        i18nLazy(function (i18n) {
+        i18nPlugin('*', require, function (i18n) {
 
           define([
             'lodash',
@@ -47,9 +48,9 @@ describe('parser', () => {
             BackboneValidation) {
               'use strict';
               console.log('i18n', i18n);
-            };
-          });
-        });
+          };
+        }, {});
+      }, {});
     `));
   });
 
@@ -65,7 +66,7 @@ describe('parser', () => {
     },
     {
       name: 'foo',
-      args: '*',
+      args: 'bar',
       index: 4
     }]);
   });
@@ -98,15 +99,15 @@ describe('parser', () => {
     const plugins = parser.findPlugins(requestedDependencies);
 
     expect(beautify(parser.lazyLoadPlugins(fileFixture, plugins))).to.equal(beautify(`
-      var fooLazy = require('bundle!foo');
+      var fooPlugin = require('foo').load;
 
-      fooLazy(function (foo) {
-        var i18nLazy = require('bundle!i18n');
+      fooPlugin('bar', require, function (foo) {
+        var i18nPlugin = require('i18n').load;
 
-        i18nLazy(function (i18n) {
+        i18nPlugin('*', require, function (i18n) {
           ${fileFixture}
-        });
-      });
+        }, {});
+      }, {});
     `));
   });
 });

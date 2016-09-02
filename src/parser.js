@@ -47,12 +47,12 @@ const parse = (file) => {
 };
 
 const lazyLoadPlugins = (file, plugins) =>
-  plugins.reduce((file, {name}) =>
-    `var ${name}Lazy = require('bundle!${name}');
+  plugins.reduce((file, {name, args}) =>
+    `var ${name}Plugin = require('${name}').load;
 
-    ${name}Lazy(function (${name}) {
+    ${name}Plugin('${args}', require, function (${name}) {
       ${file}
-    });`
+    }, {});`
   , file);
 
 module.exports = {
