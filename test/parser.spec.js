@@ -1,3 +1,4 @@
+'use strict';
 let expect = require('chai').expect;
 let parser = require('../src/parser');
 let jsBeautify = require('js-beautify').js_beautify;

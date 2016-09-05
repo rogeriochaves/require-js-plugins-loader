@@ -1,3 +1,4 @@
+'use strict';
 const defineRegex = `define\\(.*?\\[([\\s\\S]*?)\\].*?`;
 const anyFunctionRegex = `\\(([\\s\\S]*?)\\)`;
 const amdRegex = new RegExp(`${defineRegex}${anyFunctionRegex}`);
@@ -37,10 +38,10 @@ const removePluginsFromInjectedDependencies = (injectedDependencies, plugins) =>
     .replace(lastCommaRegex, '$1');
 
 const lazyLoadPlugins = (file, plugins) =>
-  plugins.reduce((file, {name, args}) =>
-    `var ${name}Plugin = require('${name}').load;
+  plugins.reduce((file, plugin) =>
+    `var ${plugin.name}Plugin = require('${plugin.name}').load;
 
-    ${name}Plugin('${args}', require, function (${name}) {
+    ${plugin.name}Plugin('${plugin.args}', require, function (${plugin.name}) {
       ${file}
     }, {});`
   , file);

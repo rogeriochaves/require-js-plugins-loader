@@ -1,3 +1,4 @@
+'use strict';
 let expect = require('chai').expect;
 let loader = require('../index');
 let parser = require('../src/parser');
