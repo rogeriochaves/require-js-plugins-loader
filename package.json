@@ -9,13 +9,18 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build-example": "cd example && webpack"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "chai": "^3.5.0",
     "js-beautify": "^1.6.4",
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "webpack": "^1.13.2"
+  },
+  "dependencies": {
+    "webpack-sources": "^0.1.2"
   }
 }
