@@ -28,49 +28,44 @@ describe('parser', () => {
     ) {
       'use strict';
       console.log('i18n', i18n);
-    };
+    });
   `);
 
-  it('parses the file, loading the requirejs plugins', () => {
+  it('parses the file, adding special comments for the requirejs plugins', () => {
     expect(beautify(parser.parse(fileFixture))).to.equal(beautify(`
-      var fooPlugin = require('foo').load;
-
-      fooPlugin('bar', require, function (foo) {
-        var i18nPlugin = require('i18n').load;
-
-        i18nPlugin('*', require, function (i18n) {
-
-          define([
-            'lodash',
-            "backbone",
-            'backbone-validation'
-          ], function(
-            _,
-            Backbone,
-            BackboneValidation) {
-              'use strict';
-              console.log('i18n', i18n);
-          };
-        }, {});
-      }, {});
+      define([
+        'lodash',
+        "backbone",
+        'backbone-validation',
+        'i18n', // requirejs_plugin|*|
+        'foo' // requirejs_plugin|bar|
+      ], function(
+        _,
+        Backbone,
+        BackboneValidation,
+        i18n
+      ) {
+          'use strict';
+          console.log('i18n', i18n);
+      });
     `));
   });
 
   describe('different AMD patterns', () => {
     it('parses anonymous modules', () => {
-      expect(parser.parse(moduleSyntaxFixtures.anonymousModule)).to.match(/examplePlugin\('args'/);
+      expect(parser.parse(moduleSyntaxFixtures.anonymousModule)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
     });
 
     it('parses named modules', () => {
-      expect(parser.parse(moduleSyntaxFixtures.namedModule)).to.match(/examplePlugin\('args'/);
+      expect(parser.parse(moduleSyntaxFixtures.namedModule)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
     });
 
     it('parses anonymous modules with arrow functions', () => {
-      expect(parser.parse(moduleSyntaxFixtures.anonymousArrow)).to.match(/examplePlugin\('args'/);
+      expect(parser.parse(moduleSyntaxFixtures.anonymousArrow)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
     });
 
     it('parses named modules with arrow functions', () => {
-      expect(parser.parse(moduleSyntaxFixtures.namedArrow)).to.match(/examplePlugin\('args'/);
+      expect(parser.parse(moduleSyntaxFixtures.namedArrow)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
     });
 
     it('ignores non-amd modules', () => {
@@ -86,56 +81,13 @@ describe('parser', () => {
     expect(beautify(parser.requestedDependencies(fileFixture))).to.equal(beautify(requestedDependencies));
   });
 
-  it('finds plugins', () => {
-    expect(parser.findPlugins(requestedDependencies)).to.deep.equal([{
-      name: 'i18n',
-      args: '*',
-      index: 3
-    },
-    {
-      name: 'foo',
-      args: 'bar',
-      index: 4
-    }]);
-  });
-
-  it('removes the plugins from requested dependencies', () => {
-    expect(beautify(parser.removePluginsFromRequestedDependencies(requestedDependencies))).to.equal(beautify(`
+  it('annotates plugins in the requested dependencies', () => {
+    expect(beautify(parser.annotatesPluginsInRequestedDependencies(requestedDependencies))).to.equal(beautify(`
       'lodash',
       "backbone",
-      'backbone-validation'
-    `));
-  });
-
-  it('finds the injected dependencies', () => {
-    expect(beautify(parser.injectedDependencies(fileFixture))).to.equal(
-      beautify(injectedDependencies)
-    );
-  });
-
-  it('removes the plugins from injected dependencies', () => {
-    const plugins = parser.findPlugins(requestedDependencies);
-
-    expect(beautify(parser.removePluginsFromInjectedDependencies(injectedDependencies, plugins))).to.equal(beautify(`
-      _,
-      Backbone,
-      BackboneValidation
-    `));
-  });
-
-  it('adds lazy loaded plugins', () => {
-    const plugins = parser.findPlugins(requestedDependencies);
-
-    expect(beautify(parser.lazyLoadPlugins(fileFixture, plugins))).to.equal(beautify(`
-      var fooPlugin = require('foo').load;
-
-      fooPlugin('bar', require, function (foo) {
-        var i18nPlugin = require('i18n').load;
-
-        i18nPlugin('*', require, function (i18n) {
-          ${fileFixture}
-        }, {});
-      }, {});
+      'backbone-validation',
+      'i18n', // requirejs_plugin|*|
+      'foo' // requirejs_plugin|bar|
     `));
   });
 
