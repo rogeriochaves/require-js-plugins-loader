@@ -52,20 +52,22 @@ describe('parser', () => {
   });
 
   describe('different AMD patterns', () => {
+    const parsedRequire = /example', \/\/ requirejs_plugin\|args\|/;
+
     it('parses anonymous modules', () => {
-      expect(parser.parse(moduleSyntaxFixtures.anonymousModule)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
+      expect(parser.parse(moduleSyntaxFixtures.anonymousModule)).to.match(parsedRequire);
     });
 
     it('parses named modules', () => {
-      expect(parser.parse(moduleSyntaxFixtures.namedModule)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
+      expect(parser.parse(moduleSyntaxFixtures.namedModule)).to.match(parsedRequire);
     });
 
     it('parses anonymous modules with arrow functions', () => {
-      expect(parser.parse(moduleSyntaxFixtures.anonymousArrow)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
+      expect(parser.parse(moduleSyntaxFixtures.anonymousArrow)).to.match(parsedRequire);
     });
 
     it('parses named modules with arrow functions', () => {
-      expect(parser.parse(moduleSyntaxFixtures.namedArrow)).to.match(/example', \/\/ requirejs_plugin\|args\|/);
+      expect(parser.parse(moduleSyntaxFixtures.namedArrow)).to.match(parsedRequire);
     });
 
     it('ignores non-amd modules', () => {
