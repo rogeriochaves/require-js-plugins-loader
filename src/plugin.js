@@ -1,3 +1,4 @@
+'use strict';
 let ReplaceSource = require('webpack-sources').ReplaceSource;
 let RawSource = require('webpack-sources').RawSource;
 
@@ -45,10 +46,10 @@ const parsePluginRequires = (plugins) =>
 
 const parsePluginRequire = (plugins, file) => {
   const parts = file.match(new RegExp(pluginsRegex));
-  return [...plugins, {
+  return plugins.concat([{
     webpackRequire: parts[1],
     args: parts[2]
-  }]
+  }]);
 };
 
 const initialRequire = '__webpack_require__(0);';

@@ -1,3 +1,4 @@
-let {RequirejsPluginsLoaderPlugin} = require('./src/plugin');
+'use strict';
+let plugin = require('./src/plugin');
 
-module.exports = RequirejsPluginsLoaderPlugin;
+module.exports = plugin.RequirejsPluginsLoaderPlugin;

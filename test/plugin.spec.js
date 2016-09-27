@@ -1,3 +1,4 @@
+'use strict';
 let expect = require('chai').expect;
 let plugin = require('../src/plugin');
 let jsBeautify = require('js-beautify').js_beautify;
@@ -71,7 +72,7 @@ describe('plugin', () => {
       webpackRequire: '3',
       args: '*'
     }];
-    initialLoad = 'return __webpack_require__(0);';
+    const initialLoad = 'return __webpack_require__(0);';
 
     expect(beautify(plugin.patchInitialLoad(initialLoad, plugins))).to.equal(beautify(
       `__webpack_require__.requirejs_plugin = {};
