@@ -69,6 +69,22 @@ describe('plugin', () => {
     }]);
   });
 
+  it('ignores duplicated requires', () => {
+    const pluginRequires = [
+      '__webpack_require__(2), // requirejs_plugin|someArg|',
+      '__webpack_require__(2), // requirejs_plugin|someArg|',
+      '__webpack_require__(2) // requirejs_plugin|anotherArg|'
+    ];
+
+    expect(plugin.parsePluginRequires(pluginRequires)).to.deep.equal([{
+      webpackRequire: '2',
+      args: 'someArg'
+    }, {
+      webpackRequire: '2',
+      args: 'anotherArg'
+    }]);
+  });
+
   it('patches the initial load with all the plugins', () => {
     const plugins = [{
       webpackRequire: '2',

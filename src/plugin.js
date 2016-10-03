@@ -1,6 +1,7 @@
 'use strict';
 let ReplaceSource = require('webpack-sources').ReplaceSource;
 let RawSource = require('webpack-sources').RawSource;
+let uniq = require('ramda').uniq;
 
 class RequirejsPluginsLoaderPlugin {
   apply (compiler) {
@@ -42,7 +43,7 @@ const patchRequires = (file) =>
       file.replace(new RegExp(pluginsRegex, 'g'), `__webpack_require__.requirejs_plugin['$1!$3']$2`);
 
 const parsePluginRequires = (plugins) =>
-      plugins.reduce(parsePluginRequire, []);
+      uniq(plugins.reduce(parsePluginRequire, []));
 
 const parsePluginRequire = (plugins, file) => {
   const parts = file.match(new RegExp(pluginsRegex));
