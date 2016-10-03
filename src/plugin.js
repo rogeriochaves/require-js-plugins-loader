@@ -36,10 +36,10 @@ const parse = (file) => {
 
 const findPluginRequires = (file) => file.match(new RegExp(pluginsRegex, 'g'));
 
-const pluginsRegex = '__webpack_require__\\((.*?)\\) \\/\\/ requirejs_plugin\\|(.*?)\\|';
+const pluginsRegex = '__webpack_require__\\((.*?)\\)(.*?) \\/\\/ requirejs_plugin\\|(.*?)\\|';
 
 const patchRequires = (file) =>
-      file.replace(new RegExp(pluginsRegex, 'g'), `__webpack_require__.requirejs_plugin['$1!$2']`);
+      file.replace(new RegExp(pluginsRegex, 'g'), `__webpack_require__.requirejs_plugin['$1!$3']$2`);
 
 const parsePluginRequires = (plugins) =>
       plugins.reduce(parsePluginRequire, []);
@@ -48,7 +48,7 @@ const parsePluginRequire = (plugins, file) => {
   const parts = file.match(new RegExp(pluginsRegex));
   return plugins.concat([{
     webpackRequire: parts[1],
-    args: parts[2]
+    args: parts[3]
   }]);
 };
 
