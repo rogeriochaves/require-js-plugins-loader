@@ -12,7 +12,8 @@ describe('parser', () => {
     "backbone",
     'backbone-validation',
     \`i18n!*\`,
-    'foo!bar'
+    'do-not-parse-me!please',
+    '../foo!bar'
   `;
   const injectedDependencies = `
     _,
@@ -30,15 +31,17 @@ describe('parser', () => {
       console.log('i18n', i18n);
     });
   `);
+  const configPlugins = ['i18n', 'foo'];
 
-  it('parses the file, adding special comments for the requirejs plugins', () => {
-    expect(beautify(parser.parse(fileFixture))).to.equal(beautify(`
+  it('parses the file, adding special comments for the configured requirejs plugins', () => {
+    expect(beautify(parser.parse(fileFixture, configPlugins))).to.equal(beautify(`
       define([
         'lodash',
         "backbone",
         'backbone-validation',
         'i18n', // requirejs_plugin|*|
-        'foo' // requirejs_plugin|bar|
+        'do-not-parse-me!please',
+        '../foo' // requirejs_plugin|bar|
       ], function(
         _,
         Backbone,
@@ -83,13 +86,25 @@ describe('parser', () => {
     expect(beautify(parser.requestedDependencies(fileFixture))).to.equal(beautify(requestedDependencies));
   });
 
-  it('annotates plugins in the requested dependencies', () => {
+  it('annotates specified plugins in the requested dependencies', () => {
+    expect(beautify(parser.annotatesPluginsInRequestedDependencies(requestedDependencies, configPlugins))).to.equal(beautify(`
+      'lodash',
+      "backbone",
+      'backbone-validation',
+      'i18n', // requirejs_plugin|*|
+      'do-not-parse-me!please',
+      '../foo' // requirejs_plugin|bar|
+    `));
+  });
+
+  it('annotates all plugins in the requested dependencies if there is no config', () => {
     expect(beautify(parser.annotatesPluginsInRequestedDependencies(requestedDependencies))).to.equal(beautify(`
       'lodash',
       "backbone",
       'backbone-validation',
       'i18n', // requirejs_plugin|*|
-      'foo' // requirejs_plugin|bar|
+      'do-not-parse-me', // requirejs_plugin|please|
+      '../foo' // requirejs_plugin|bar|
     `));
   });
 

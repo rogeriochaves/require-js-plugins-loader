@@ -12,6 +12,9 @@ module.exports = {
       { test: /\.js$/, loader: '../index.js' }
     ]
   },
+  requirejsPlugins: {
+    plugins: ['pluginDependency']
+  },
   plugins: [
     new RequirejsPluginsLoaderPlugin(),
     new webpack.optimize.UglifyJsPlugin()
