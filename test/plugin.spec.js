@@ -25,7 +25,8 @@ describe('plugin', () => {
     /***/ function(module, exports, __webpack_require__) {
 
       var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-        __webpack_require__(2) // requirejs_plugin|someArg|
+        __webpack_require__(2), // requirejs_plugin|someArg|
+        __webpack_require__(3) // requirejs_plugin|barBaz|
       ], __WEBPACK_AMD_DEFINE_RESULT__ = function (loadedPlugin) {
         return {
           pluginResult: loadedPlugin.result
@@ -36,7 +37,10 @@ describe('plugin', () => {
 
   it('patches the requires, replacing with requirejs_plugin require', () => {
     expect(plugin.patchRequires(bundledFileFixture)).not.to.contain(
-      '__webpack_require__(2) // requirejs_plugin|someArg|'
+      '__webpack_require__(2), // requirejs_plugin|someArg|'
+    );
+    expect(plugin.patchRequires(bundledFileFixture)).not.to.contain(
+      '__webpack_require__(3) // requirejs_plugin|barBaz|'
     );
     expect(plugin.patchRequires(bundledFileFixture)).to.contain(
       "__webpack_require__.requirejs_plugin['2!someArg']"
@@ -45,13 +49,14 @@ describe('plugin', () => {
 
   it('finds plugin requires', () => {
     expect(plugin.findPluginRequires(bundledFileFixture)).to.deep.equal([
-      '__webpack_require__(2) // requirejs_plugin|someArg|'
+      '__webpack_require__(2), // requirejs_plugin|someArg|',
+      '__webpack_require__(3) // requirejs_plugin|barBaz|'
     ]);
   });
 
   it('parses the plugin requires', () => {
     const pluginRequires = [
-      '__webpack_require__(2) // requirejs_plugin|someArg|',
+      '__webpack_require__(2), // requirejs_plugin|someArg|',
       '__webpack_require__(3) // requirejs_plugin|*|'
     ];
 
@@ -61,6 +66,22 @@ describe('plugin', () => {
     }, {
       webpackRequire: '3',
       args: '*'
+    }]);
+  });
+
+  it('ignores duplicated requires', () => {
+    const pluginRequires = [
+      '__webpack_require__(2), // requirejs_plugin|someArg|',
+      '__webpack_require__(2), // requirejs_plugin|someArg|',
+      '__webpack_require__(2) // requirejs_plugin|anotherArg|'
+    ];
+
+    expect(plugin.parsePluginRequires(pluginRequires)).to.deep.equal([{
+      webpackRequire: '2',
+      args: 'someArg'
+    }, {
+      webpackRequire: '2',
+      args: 'anotherArg'
     }]);
   });
 
@@ -93,7 +114,10 @@ describe('plugin', () => {
       /******/ 	__webpack_require__.requirejs_plugin = {};
       return __webpack_require__(2).load('someArg', {}, function (result) {
         __webpack_require__.requirejs_plugin['2!someArg'] = result;
-        __webpack_require__(0);
+        __webpack_require__(3).load('barBaz', {}, function (result) {
+          __webpack_require__.requirejs_plugin['3!barBaz'] = result;
+          __webpack_require__(0);
+        }, {});
       }, {});
       /* 0 */
       /***/ function(module, exports, __webpack_require__) {
@@ -109,7 +133,8 @@ describe('plugin', () => {
       /***/ function(module, exports, __webpack_require__) {
 
         var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-          __webpack_require__.requirejs_plugin['2!someArg']
+          __webpack_require__.requirejs_plugin['2!someArg'],
+          __webpack_require__.requirejs_plugin['3!barBaz']
         ], __WEBPACK_AMD_DEFINE_RESULT__ = function (loadedPlugin) {
           return {
             pluginResult: loadedPlugin.result

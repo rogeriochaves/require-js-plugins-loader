@@ -21,6 +21,7 @@
     "webpack": "^1.13.2"
   },
   "dependencies": {
+    "ramda": "^0.22.1",
     "webpack-sources": "^0.1.2"
   }
 }
