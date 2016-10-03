@@ -13,7 +13,7 @@ describe('parser', () => {
     'backbone-validation',
     \`i18n!*\`,
     'do-not-parse-me!please',
-    'foo!bar'
+    '../foo!bar'
   `;
   const injectedDependencies = `
     _,
@@ -41,7 +41,7 @@ describe('parser', () => {
         'backbone-validation',
         'i18n', // requirejs_plugin|*|
         'do-not-parse-me!please',
-        'foo' // requirejs_plugin|bar|
+        '../foo' // requirejs_plugin|bar|
       ], function(
         _,
         Backbone,
@@ -93,7 +93,7 @@ describe('parser', () => {
       'backbone-validation',
       'i18n', // requirejs_plugin|*|
       'do-not-parse-me!please',
-      'foo' // requirejs_plugin|bar|
+      '../foo' // requirejs_plugin|bar|
     `));
   });
 
@@ -104,7 +104,7 @@ describe('parser', () => {
       'backbone-validation',
       'i18n', // requirejs_plugin|*|
       'do-not-parse-me', // requirejs_plugin|please|
-      'foo' // requirejs_plugin|bar|
+      '../foo' // requirejs_plugin|bar|
     `));
   });
 

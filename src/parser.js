@@ -1,4 +1,6 @@
 'use strict';
+let path = require('path');
+
 const defineRegex = `define\\(.*?\\[([\\s\\S]*?)\\].*?`;
 const anyFunctionRegex = `\\(([\\s\\S]*?)\\)`;
 const amdRegex = new RegExp(`${defineRegex}${anyFunctionRegex}`);
@@ -11,12 +13,15 @@ const annotatesPluginsInRequestedDependencies = (requestedDependencies, config) 
   requestedDependencies.replace(pluginRegex, parsePlugin(config));
 
 const parsePlugin = (configPlugins) => (match, dependency, args, whitespace) => {
-  if (configPlugins && configPlugins.indexOf(dependency) < 0) {
+  if (isNotInConfig(configPlugins, dependency)) {
     return match;
   } else {
     return `'${dependency}'${whitespace} // requirejs_plugin|${args}|`;
   };
 };
+
+const isNotInConfig = (configPlugins, pluginPath) =>
+  configPlugins && configPlugins.indexOf(path.parse(pluginPath).name) < 0;
 
 const hasPlugins = (file) =>
   !!requestedDependencies(file).match(pluginRegex);
