@@ -1,6 +1,7 @@
 define([
+  'css!./style.css',
   './pluginDependency!someArg'
-], function (loadedPlugin) {
+], function (css, loadedPlugin) {
   return {
     pluginResult: loadedPlugin.result
   };
