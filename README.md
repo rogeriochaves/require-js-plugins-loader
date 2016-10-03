@@ -9,15 +9,18 @@ it is still in very early stage, but you can try use it like this:
 var RequirejsPluginsLoaderPlugin = require('require-js-plugins-loader/Plugin');
 
 module.exports = {
-  entry: "./index.js",
+  entry: './index.js',
   output: {
     path: __dirname,
-    filename: "bundle.js"
+    filename: 'bundle.js'
   },
   module: {
     loaders: [
       { test: /\.js$/, loader: 'require-js-plugins' }
     ]
+  },
+  requirejsPlugins: {
+    plugins: ['myPlugin'] // add requirejs plugins to be parsed here
   },
   plugins: [
     new RequirejsPluginsLoaderPlugin()
