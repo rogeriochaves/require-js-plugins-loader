@@ -7,6 +7,7 @@ describe('loader', () => {
   let cacheableCalled = false;
   let loaderContext = {
     cacheable: () => { cacheableCalled = true },
+    callback: (context, source, map) => { return source },
     options: {
       requirejsPlugins: {
         plugins: ['plugin']
