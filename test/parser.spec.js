@@ -61,6 +61,10 @@ describe('parser', () => {
       expect(parser.parse(moduleSyntaxFixtures.anonymousModule)).to.match(parsedRequire);
     });
 
+    it('parses anonymous modules with star', () => {
+      expect(parser.parse(moduleSyntaxFixtures.anonymousModuleStar)).to.match(parsedRequire);
+    });
+
     it('parses named modules', () => {
       expect(parser.parse(moduleSyntaxFixtures.namedModule)).to.match(parsedRequire);
     });
