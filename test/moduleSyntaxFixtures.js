@@ -4,6 +4,12 @@ exports.anonymousModule = `
   });
 `;
 
+exports.anonymousModuleStar = `
+  define(['dep1', 'example!*', 'dep2'], function (dep1, dep2) {
+      return function () {};
+  });
+`;
+
 exports.namedModule = `
   define('myModule', ['dep1', 'example!args', 'dep2'], function (dep1, dep2) {
       return function () {};
